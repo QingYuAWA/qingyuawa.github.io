@@ -1,585 +1,369 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-
-<head>
-    <!-- 基础信息 -->
-    <meta charset="utf-8">
-    <meta http-equiv="Access-Control-Allow-Origin" content="*">
-    <!-- 强制 HTTPS，若不需要可删除，但可能出现问题 -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <meta name="renderer" content="webkit" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="force-rendering" content="webkit" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#424242" />
-    <meta name="description" content="QingYu|MyIndex">
-    <meta name="keywords" content="Index">
-    <meta name="author" content="QingYu">
-    <title>QingYu|MyIndex</title>
-    <!-- jQuery -->
-    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/jquery/3.5.1/jquery.min.js"></script>
-    <!-- HarmonyOS Sans -->
-    <!-- 本站 CDN 已开启防盗链，非本站域名不可访问，请更改链接为下方内容，否则自定义字体将失效 -->
-    <!-- https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css -->
-    <link rel="stylesheet" href="https://s1.hdslb.com/bfs/static/jinkela/long/font/regular.css" />
-    <!-- 引入样式 -->
-    <link rel="stylesheet" type="text/css"
-        href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="./css/style.css">
-    <link rel="stylesheet" type="text/css" href="./css/mobile.css">
-    <link rel="stylesheet" type="text/css" href="./css/loading.css">
-    <link rel="stylesheet" type="text/css" href="./css/animation.css">
-    <link rel="icon" href="./favicon.ico">
-    <link rel="apple-touch-icon" href="./img/icon/apple-touch-icon.png">
-    <!-- Izitoast -->
-    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/izitoast/1.4.0/css/iziToast.min.css">
-    <script type="text/javascript"
-        src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-y/izitoast/1.4.0/js/iziToast.min.js">
-    </script>
-    <!-- Search Box -->
-    <!--
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    -->
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.1.2/css/all.min.css">
-    <!-- Aplayer -->
-    <link rel="stylesheet" href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/aplayer/1.10.1/APlayer.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-y/aplayer/1.10.1/APlayer.min.js" crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
-    <!-- <script src="./js/Meting.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-    <!-- IE Out -->
-    <script>
-        if ( /*@cc_on!@*/ false || (!!window.MSInputMethodContext && !!document.documentMode)) window.location.href =
-            "/upgrade-your-browser/index.html?referrer=" + encodeURIComponent(window.location.href);
-    </script>
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <!-- 51.LA 统计 -->
-    <script src="./js/51LA.js"></script>
-</head>
-
-<body>
-    <!--加载动画-->
-    <div id="loading-box">
-        <div class="loading-left-bg"></div>
-        <div class="loading-right-bg"></div>
-        <div class="spinner-box">
-            <div class="loader">
-                <div class="inner one"></div>
-                <div class="inner two"></div>
-                <div class="inner three"></div>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AI五子棋</title>
+        <style type='text/css'>
+            canvas {
+                display: block;
+                margin: 50px auto;
+                box-shadow: -2px -2px 2px #efefef, 5px 5px 5px #b9b9b9;
+                cursor: pointer;
+            }
+            .btn-wrap { 
+                display: flex; 
+                flex-direction: row; 
+                justify-content:center;
+            }
+            .btn-wrap div { 
+                margin: 0 10px;
+            }
+            div>span {
+                display: inline-block;
+                padding: 10px 20px;
+                color: #fff;
+                background-color: #EE82EE;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+            div.unable span { 
+                background: #D6D6D4; 
+                color: #adacaa;
+            }
+            #result-wrap {text-align: center;}
+        </style>
+    </head>
+    <body>
+        <h3 id="result-wrap">--AI五子棋--</h3>
+        <canvas id="chess" width="450px" height="450px"></canvas>
+        <div class="btn-wrap">
+            <div id='restart' class="restart">
+                <span>重新开始</span>
             </div>
-            <div class="loading-word">
-                <p class="loading-title" id="loading-title">南淮花酱|Index</p>
-                <span id="loading-text">Loading......</span>
+            <div id='goback' class="goback unable">
+                <span>悔棋</span>
+            </div>
+            <div id='return' class="return unable">
+                <span>撤销悔棋</span>
             </div>
         </div>
-    </div>
-    <section id="section" class="section">
-        <!-- 背景图片 -->
-        <style type="text/css">
-            body{
-              background: url("img/background1.webp") no-repeat center center fixed;
-                          /*兼容浏览器版本*/
-                          -webkit-background-size: cover;
-                          -o-background-size: cover;                
-                          background-size: cover;
-            } /*背景图*/
-       
-            .test {
-              margin-top: 100px;
-            }
-          </style>
-        <!-- 鼠标指针 -->
-        <div id="g-pointer-1"></div>
-        <div id="g-pointer-2"></div>
-        <!-- 主体内容 -->
-        <main id="main" class="main">
-            <!-- 搜索框 -->
-            <div class="close-btn">
-                <span class="fas fa-times"></span>
-            </div>
-            <div class="search-btn">
-                <span class="fas fa-search"></span>
-            </div>
-            <div class="search-data">
-                <input type="text" id="inp" required/>
-                <div class="line"></div>
-                <label>Type to search...</label>
-                <span class="fas fa-search" id="btn"></span>
-            </div>
-
-            <script>
-                var oInp = document.getElementById('inp');
-                var oBtn = document.getElementById('btn');
-            
-                oBtn.onclick = function () {
-                    Search();
+        <script type="text/javascript" charset="utf-8">
+            var over = false;
+            var me = true; //我
+            var _nowi = 0, _nowj = 0; //记录自己下棋的坐标
+            var _compi = 0, _compj = 0; //记录计算机当前下棋的坐标
+            var _myWin = [], _compWin = []; //记录我，计算机赢的情况
+            var backAble = false, returnAble = false; 
+            var resultTxt = document.getElementById('result-wrap');
+            var chressBord = [];//棋盘
+            for(var i = 0; i < 15; i++){
+                chressBord[i] = [];
+                for(var j = 0; j < 15; j++){
+                    chressBord[i][j] = 0;
                 }
-            
-                document.onkeydown = function () {
-                    if (event.keyCode == 13) {
-                        Search();
+            }
+            //赢法的统计数组
+            var myWin = [];
+            var computerWin = [];
+            //赢法数组
+            var wins = [];
+            for(var i = 0; i < 15; i++){
+                wins[i] = [];
+                for(var j = 0; j < 15; j++){
+                    wins[i][j] = [];
+                }
+            }
+            var count = 0; //赢法总数
+            //横线赢法
+            for(var i = 0; i < 15; i++){
+                for(var j = 0; j < 11; j++){
+                    for(var k = 0; k < 5; k++){
+                        wins[i][j+k][count] = true;
+                    }
+                    count++;
+                }
+            }
+            //竖线赢法
+            for(var i = 0; i < 15; i++){
+                for(var j = 0; j < 11; j++){
+                    for(var k = 0; k < 5; k++){
+                        wins[j+k][i][count] = true;
+                    }
+                    count++;
+                }
+            }
+            //正斜线赢法
+            for(var i = 0; i < 11; i++){
+                for(var j = 0; j < 11; j++){
+                    for(var k = 0; k < 5; k++){
+                        wins[i+k][j+k][count] = true;
+                    }
+                    count++;
+                }
+            }
+            //反斜线赢法
+            for(var i = 0; i < 11; i++){ 
+                for(var j = 14; j > 3; j--){
+                    for(var k = 0; k < 5; k++){
+                        wins[i+k][j-k][count] = true;
+                    }
+                    count++;
+                }
+            }
+            // debugger;
+            for(var i = 0; i < count; i++){
+                myWin[i] = 0;
+                _myWin[i] = 0;
+                computerWin[i] = 0;
+                _compWin[i] = 0;
+            }
+            var chess = document.getElementById("chess");
+            var context = chess.getContext('2d');
+            context.strokeStyle = '#bfbfbf'; //边框颜色
+            var backbtn = document.getElementById("goback");
+            var returnbtn = document.getElementById("return");
+            window.onload = function(){
+                drawChessBoard(); // 画棋盘
+            }
+            document.getElementById("restart").onclick = function(){
+                window.location.reload();
+            }
+            // 我，下棋
+            chess.onclick = function(e){
+                if(over){
+                    return;
+                }
+                if(!me){
+                    return;
+                }
+                // 悔棋功能可用
+                backbtn.className = backbtn.className.replace( new RegExp( "(\\s|^)unable(\\s|$)" )," " ); 
+                var x = e.offsetX;
+                var y = e.offsetY;
+                var i = Math.floor(x / 30);
+                var j = Math.floor(y / 30);
+                _nowi = i;
+                _nowj = j;
+                if(chressBord[i][j] == 0){
+                    oneStep(i,j,me);
+                    chressBord[i][j] = 1; //我，已占位置        
+                                
+                    for(var k = 0; k < count; k++){ // 将可能赢的情况都加1
+                        if(wins[i][j][k]){
+                            // debugger;
+                            myWin[k]++;
+                            _compWin[k] = computerWin[k];
+                            computerWin[k] = 6;//这个位置对方不可能赢了
+                            if(myWin[k] == 5){
+                                // window.alert('你赢了');
+                                resultTxt.innerHTML = '恭喜，路兆梅赢了！';
+                                over = true;
+                            }
+                        }
+                    }
+                    if(!over){
+                        me = !me;
+                        computerAI();
+                    }
+                }         
+            }
+            // 悔棋
+            backbtn.onclick = function(e){
+                if(!backAble) { return;}
+                over = false;
+                me = true;
+                // resultTxt.innerHTML = 'o(╯□╰)o，悔棋中';
+                // 撤销悔棋功能可用
+                returnbtn.className = returnbtn.className.replace( new RegExp( "(\\s|^)unable(\\s|$)" )," " ); 
+                // 我，悔棋
+                chressBord[_nowi][_nowj] = 0; //我，已占位置 还原
+                minusStep(_nowi, _nowj); //销毁棋子                                  
+                for(var k = 0; k < count; k++){ // 将可能赢的情况都减1
+                    if(wins[_nowi][_nowj][k]){
+                        myWin[k]--;
+                        computerWin[k] = _compWin[k];//这个位置对方可能赢
                     }
                 }
-            
-                function Search() {
-                    var url = 'https://cn.bing.com/search?q=' + oInp.value;
-                    window.open(url,'_self');
+                // 计算机相应的悔棋
+                chressBord[_compi][_compj] = 0; //计算机，已占位置 还原
+                minusStep(_compi, _compj); //销毁棋子                                  
+                for(var k = 0; k < count; k++){ // 将可能赢的情况都减1
+                    if(wins[_compi][_compj][k]){
+                        computerWin[k]--;
+                        myWin[k] = _myWin[i];//这个位置对方可能赢
+                    }
                 }
-            </script>
-
-            <script>
-                $(".search-btn").click(function(){
-                    $(this).css("display","none");
-                    $(".search-data").fadeIn(500);
-                    $(".close-btn").fadeIn(500);
-                    $(".search-data .line").addClass("active");
-                    setTimeout(function(){
-                        $("input").focus();
-                        $(".search-data label").fadeIn(500);
-                        $(".search-data span").fadeIn(500);
-                    }, 800);
-                });
-                $(".close-btn").click(function(){
-                    $(".search-btn").fadeIn(800);
-                    $(".search-data").fadeOut(500);
-                    $(".close-btn").fadeOut(500);
-                    $(".search-data .line").removeClass("active");
-                    $("input").val("");
-                    $(".search-data label").fadeOut(500);
-                    $(".search-data span").fadeOut(500);
-                });
-            </script>
-            <div class="container" id="container">
-                <div class="row" id="row">
-                    <div class="col left">
-                        <!--基本信息-->
-                        <div class="main-left">
-                            <!--Logo-->
-                            <div class="main-img">
-                                <img id="logo-img" src="./img/icon/logo.png" alt="img">
-                                <div class="img-title">
-                                    <span class="img-title-big" id="logo-text-1">QingYu</span>
-                                    <span class="img-text" id="logo-text-2">.io</span>
-                                </div>
-                            </div>
-                            <!--介绍信息-->
-                            <div class="message cards" id="switchmore">
-                                <div class="des" id="des">
-                                    <i class="fa-solid fa-quote-left"></i>
-                                    <div class="des-title"><span id="change">Hello&nbsp;World&nbsp;!</span><br /><span
-                                            id="change1">一个不正经的Up  |  +V: hsbupt</span></div>
-                                    <i class="fa-solid fa-quote-right"></i>
-                                </div>
-                            </div>
-                            <!--社交链接-->
-                            <div class="social" id="social">
-                                <a href="https://github.com/hsBUPT" class="link" id="github" style="margin-left: 4px"
-                                    target="_blank">
-                                    <i class="fa-brands fa-github"></i>
-                                </a>
-                                <a href="https://wpa.qq.com/msgrd?v=3&uin=2257757362&site=qq&menu=yes" class="link"
-                                    id="qq" target="_blank">
-                                    <i class="fa-brands fa-qq"></i>
-                                </a>
-                                <a href="mailto:2257757362@qq.com" class="link" id="email">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </a>
-                                <a href="https://space.bilibili.com/1410673018" class="link" id="bilibili"
-                                    target="_blank">
-                                    <i class="fa-brands fa-bilibili"></i>
-                                </a>
-                                <a href="https://t.me/BUPT_hs" class="link" id="telegram" target="_blank">
-                                    <i class="fa-brands fa-telegram"></i>
-                                </a>
-                                <a id="link-text">通过这里联系我</a>
-                            </div>
-                        </div>
-                    </div>
-                    <!--第二屏 Logo-->
-                    <div class="logo cards" style="display: none" id="changemore">
-                        <a class="logo-text" id="logo-text-small">imsyy.top</a>
-                    </div>
-                    <div class="col right">
-                        <div class="main-right">
-                            <!--功能区-->
-                            <div class="row rightone" id="rightone">
-                                <div class="col hitokotos">
-                                    <!--一言-->
-                                    <div class="hitokoto cards" id="hitokoto">
-                                        <!--切换音乐-->
-                                        <div class="open-music fixed-top" id="open-music">
-                                            <i class="fa-solid fa-compact-disc"></i>
-                                            <span>&nbsp;打开音乐播放器</span>
-                                        </div>
-                                        <!--切换音乐结束-->
-                                        <div class="hitokoto-all">
-                                            <div class="hitokoto-text"><span id="hitokoto_text">一个不正经的Up</span>
-                                            </div>
-                                            <div class="hitokoto-from">-「&nbsp;<span id="from_text">南淮花酱</span>&nbsp;」
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!--音乐-->
-                                    <div class="music" id="music">
-                                        <div class="music-all">
-                                            <div class="music-button">
-                                                <div id="music-open">音乐列表</div>
-                                                <div id="music-close">回到一言</div>
-                                            </div>
-                                            <div class="music-control">
-                                                <i class="fa-solid fa-backward-step" id="last"></i>
-                                                <div id="play">
-                                                    <i class="fa-solid fa-play"></i>
-                                                </div>
-                                                <i class="fa-solid fa-forward-step" id="next"></i>
-                                            </div>
-                                            <div class="music-menu">
-                                                <div class="music-text">
-                                                    <span id="music-name">未播放音乐</span>
-                                                </div>
-                                                <div class="music-volume" style="display: none;">
-                                                    <div id="volume-ico">
-                                                        <i class="fa-solid fa-volume-low"></i>
-                                                    </div>
-                                                    <input type="range" min="0" max="1" step="0.01" id="volume">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col times">
-                                    <!--时间-->
-                                    <div class="time cards" id="upWeather">
-                                        <div class="timeshow" id="time">
-                                            2000&nbsp;年&nbsp;0&nbsp;月&nbsp;00&nbsp;日&nbsp;<span
-                                                class="weekday">星期一</span><br><span class="time-text">00:00:00</span>
-                                        </div>
-                                        <div class="weather">
-                                            <span id="city_text"> </span>&nbsp;
-                                            <span id="wea_text"> </span>&nbsp;
-                                            <span id="tem_text"> </span>
-                                            <span id="win_text"> </span>
-                                            <span id="win_speed"> </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <!--分隔线-->
-                            <div class="line">
-                                <i class="fa-solid fa-link"></i>
-                                <span class="line-text">网站列表</span>
-                            </div>
-                            <!--网站链接-->
-                            <div class="link">
-                                <!--第一组-->
-                                <div class="row">
-                                    <div class="col">
-                                        <a id="link-url-1" href="https://www.csdn.net/" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-1" class="fa-solid fa-blog"></i>
-                                                <span class="link-name" id="link-name-1">CSDN</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col 2">
-                                        <a id="link-url-2" href="https://pan.baidu.com/" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-2" class="fa-solid fa-cloud"></i>
-                                                <span class="link-name" id="link-name-2">NetPan</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col">
-                                        <a id="link-url-3" href="https://music.163.com/" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-3" class="fa-solid fa-music"></i>
-                                                <span class="link-name" id="link-name-3">Music</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                                <!--第二组-->
-                                <div class="row" style="margin-top: 1.5rem;">
-                                    <div class="col">
-                                        <a id="link-url-4" href="https://www.bing.com/" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-4" class="fa-solid fa-compass"></i>
-                                                <span class="link-name" id="link-name-4">Bing</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col 2">
-                                        <a id="link-url-5" href="https://openai.com/" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-5" class="fa-solid fa-book-bookmark"></i>
-                                                <span class="link-name" id="link-name-5">OpenAI</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                    <div class="col">
-                                        <a id="link-url-6" href="https://github.com/arofish/Mirror-pi" target="_blank">
-                                            <div class="link-card cards">
-                                                <i id="link-icon-6" class="fa-solid fa-flask"></i>
-                                                <span class="link-name" id="link-name-6">Mirror-pi</span>
-                                            </div>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--展开菜单按钮-->
-                <div class="menu" id="switchmenu">
-                    <a class="munu-button cards" id="menu">
-                        <i class="fa-solid fa-bars"></i>
-                    </a>
-                </div>
-                <!--更多内容-->
-                <div class="more" id="more">
-                    <!--关闭按钮-->
-                    <div class="close fixed-top" id="close">
-                        <i class="fa-solid fa-circle-xmark"></i>
-                    </div>
-                    <div class="line" style="margin-top: 1rem;">
-                        <i class="fa-solid fa-angle-left"></i>
-                        <span class="line-text">时间胶囊</span>
-                        <i class="fa-solid fa-angle-right"></i>
-                    </div>
-                    <div class="date" id="date">
-                        <div class="item" id="dayProgress">
-                            <div class="date-text" style="margin-top: 0rem;">今日已经度过了&nbsp;<span></span>&nbsp;小时</div>
-                            <div class="progress">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-                        <div class="item" id="weekProgress">
-                            <div class="date-text">本周已经度过了&nbsp;<span></span>&nbsp;天</div>
-                            <div class="progress">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-                        <div class="item" id="monthProgress">
-                            <div class="date-text">本月已经度过了&nbsp;<span></span>&nbsp;天</div>
-                            <div class="progress">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-                        <div class="item" id="yearProgress">
-                            <div class="date-text">今年已经度过了&nbsp;<span></span>&nbsp;个月</div>
-                            <div class="progress">
-                                <div class="progress-bar"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="line">
-                        <i class="fa-solid fa-angle-left"></i>
-                        <span class="line-text">杂七杂八</span>
-                        <i class="fa-solid fa-angle-right"></i>
-                    </div>
-                    <!--网站链接-->
-                    <div class="row">
-                        <div class="col">
-                            <a href="https://www.cupfox.app/" target="_blank">
-                                <div class="link-card cards">
-                                    <span class="link-name">CupFox</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col 2">
-                            <a href="https://tool.oschina.net/highlight" target="_blank">
-                                <div class="link-card cards">
-                                    <span class="link-name">Code高亮</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a href="https://auth.bupt.edu.cn/" target="_blank">
-                                <div class="link-card cards">
-                                    <span class="link-name">云平台</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top: 1.5rem;">
-                        <div class="col">
-                            <a href="https://chat.forefront.ai/" target="_blank">
-                                <div class="link-card cards">
-                                    <span class="link-name">ChatGPT</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col 2">
-                            <a href="https://portals.zhihuishu.com/" target="_blank">
-                                <div class="link-card cards">
-                                    <span class="link-name">智慧树</span>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="col">
-                            <a id="openmore">
-                                <div class="link-card cards">
-                                    <span class="link-name">更多</span>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <!--更多页面-->
-                <div class="box" id="box" style="display: none">
-                    <div class="box-wrapper">
-                        <!--关闭按钮-->
-                        <div class="closebox fixed-top" id="closemore">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </div>
-                        <!--左侧内容-->
-                        <div class="box-left">
-                            <div class="img-title">
-                                <span class="img-title-big" id="logo-title-other">QingYu</span>
-                                <span class="img-text" id="logo-title-other-small">.io</span><br />
-                                <span class="img-text">&nbsp;v&nbsp;1.1</span>
-                                <a href="https://github.com/hsBUPT" target="_blank">
-                                    <i class="fa-brands fa-github"></i>
-                                </a>
-                            </div>
-                            <!--更多内容-->
-                            <div class="accordion" id="accordion">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingOne">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#collapseOne" aria-expanded="true"
-                                            aria-controls="collapseOne">
-                                            壁纸设置
-                                        </button>
-                                    </h2>
-                                    <div id="collapseOne" class="accordion-collapse collapse show"
-                                        aria-labelledby="headingOne" data-bs-parent="#accordion">
-                                        <div class="accordion-body">
-                                            <div class="set">
-                                                <div class="wallpaper" id="wallpaper">
-                                                    <div class="form-radio">
-                                                        <input type="radio" class="set-wallpaper" style="display: none;"
-                                                            id="radio1" value="1" name="wallpaper-type">
-                                                        <label for="radio1">默认壁纸</label>
-                                                    </div>
-                                                    <div class="form-radio">
-                                                        <input type="radio" class="set-wallpaper" style="display: none;"
-                                                            id="radio2" value="2" name="wallpaper-type">
-                                                        <label for="radio2" id="wallpaper_text1">每日一图</label>
-                                                    </div>
-                                                    <div class="form-radio">
-                                                        <input type="radio" class="set-wallpaper" style="display: none;"
-                                                            id="radio3" value="3" name="wallpaper-type">
-                                                        <label for="radio3" id="wallpaper_text2">随机风景</label>
-                                                    </div>
-                                                    <div class="form-radio">
-                                                        <input type="radio" class="set-wallpaper" style="display: none;"
-                                                            id="radio4" value="4" name="wallpaper-type">
-                                                        <label for="radio4" id="wallpaper_text3">随机动漫</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--更新日志-->
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingTwo">
-                                        <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#collapseTwo"
-                                            aria-expanded="false" aria-controls="collapseTwo">
-                                            更新日志
-                                        </button>
-                                    </h2>
-                                    <div id="collapseTwo" class="accordion-collapse collapse"
-                                        aria-labelledby="headingTwo" data-bs-parent="#accordion">
-                                        <div class="accordion-body">
-                                            <div class="upnote">
-						<span class="uptext">
-                                                    <i class="fa-solid fa-circle-plus"></i>&nbsp;加快网页相应速度 By.阿坤
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-circle-plus"></i>&nbsp;添加搜索框及动画css样式
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-circle-plus"></i>&nbsp;音乐歌单支持快速自定义
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-circle-plus"></i>&nbsp;壁纸支持个性化设置
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-circle-plus"></i>&nbsp;音乐播放器支持音量控制
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-screwdriver-wrench"></i>&nbsp;修复天气 API
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-screwdriver-wrench"></i>&nbsp;时光胶囊显示错误
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-screwdriver-wrench"></i>&nbsp;移动端动画及细节
-                                                </span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-screwdriver-wrench"></i>&nbsp;图标更换为 Font
-                                                    Awesome</span>
-                                                <span class="uptext">
-                                                    <i class="fa-solid fa-rotate-left"></i>
-                                                    <a href="./old/" style="color:#efefef">返回旧版站点</a>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--Aplayer-->
-                        <div class="box-right">
-                            <div id="aplayer">
-                                <span>音乐播放器加载失败</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <!-- 版权信息 -->
-        <footer id="footer" class="fixed-bottom footer">
-            <div class="power">Copyright&nbsp;©&nbsp;<span id="power-year">2022</span>
-                <script>
-                    document.write(' - ' + (new Date()).getFullYear())
-                </script>&nbsp;<a href="http://www.hsbupt.love/" id="power-text">南淮花酱|Hs</a>&nbsp;&amp;&nbsp;
-                <!-- 以下信息请不要修改哦 -->
-                Made&nbsp;⚙Modified from&nbsp;<a href="/" target="_blank">imsyy</a>
-				🔒<a href="https://beian.miit.gov.cn/">暂未备案</a>
-            </div>
-            <!-- 歌词显示 -->
-            <div id="lrc"></div>
-        </footer>
-    </section>
-    <!-- sw.js -->
-    <script>
-        if ("serviceWorker" in navigator) {
-            window.addEventListener("load", function () {
-                navigator.serviceWorker.register("sw.js");
-            });
-        }
-    </script>
-    <!-- noscript -->
-    <noscript>
-        <div class="noscript fixed-top">请开启 JavaScript</div>
-    </noscript>
-    <!-- JS -->
-    <script type="text/javascript" src="./js/main.js"></script>
-    <script type="text/javascript" src="./js/set.js"></script>
-    <script type="text/javascript" src="./js/time.js"></script>
-    <script type="text/javascript" src="./js/js.cookie.js"></script>
-    <script type="text/javascript"
-        src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.0/js/bootstrap.min.js">
-    </script>
-</body>
-
+                resultTxt.innerHTML = '--路兆梅五子棋--';
+                returnAble = true;
+                backAble = false;
+            }
+            // 撤销悔棋
+            returnbtn.onclick = function(e){
+                if(!returnAble) { return; }
+                   // 我，撤销悔棋
+                chressBord[_nowi][_nowj] = 1; //我，已占位置 
+                oneStep(_nowi,_nowj,me);                              
+                for(var k = 0; k < count; k++){ 
+                    if(wins[_nowi][_nowj][k]){
+                        myWin[k]++;
+                        _compWin[k] = computerWin[k];
+                        computerWin[k] = 6;//这个位置对方不可能赢
+                    }
+                    if(myWin[k] == 5){
+                        resultTxt.innerHTML = '恭喜，路兆梅赢了！';
+                        over = true;
+                    }
+                }
+                // 计算机撤销相应的悔棋
+                chressBord[_compi][_compj] = 2; //计算机，已占位置   
+                oneStep(_compi,_compj,false);                               
+                for(var k = 0; k < count; k++){ // 将可能赢的情况都减1
+                    if(wins[_compi][_compj][k]){
+                        computerWin[k]++;
+                        _myWin[k] = myWin[k];
+                        myWin[k] = 6;//这个位置对方不可能赢
+                    }
+                    if(computerWin[k] == 5){
+                        resultTxt.innerHTML = 'o(╯□╰)o，计算机赢了，路兆梅继续加油哦！';
+                        over = true;
+                    }
+                }
+                returnbtn.className += ' '+ 'unable';
+                returnAble = false;
+                backAble = true;
+            }
+            // 计算机下棋
+            var computerAI = function (){
+                var myScore = [];
+                var computerScore = [];
+                var max = 0;
+                var u = 0, v = 0;
+                for(var i = 0; i < 15; i++){
+                    myScore[i] = [];
+                    computerScore[i] = [];
+                    for(var j = 0; j < 15; j++){
+                        myScore[i][j] = 0;
+                        computerScore[i][j] = 0;
+                    }
+                }
+                for(var i = 0; i < 15; i++){
+                    for(var j = 0; j < 15; j++){
+                        if(chressBord[i][j] == 0){
+                            for(var k = 0; k < count; k++){
+                                if(wins[i][j][k]){
+                                    if(myWin[k] == 1){
+                                        myScore[i][j] += 200;
+                                    }else if(myWin[k] == 2){
+                                        myScore[i][j] += 400;
+                                    }else if(myWin[k] == 3){
+                                        myScore[i][j] += 2000;
+                                    }else if(myWin[k] == 4){
+                                        myScore[i][j] += 10000;
+                                    }
+                                    
+                                    if(computerWin[k] == 1){
+                                        computerScore[i][j] += 220;
+                                    }else if(computerWin[k] == 2){
+                                        computerScore[i][j] += 420;
+                                    }else if(computerWin[k] == 3){
+                                        computerScore[i][j] += 2100;
+                                    }else if(computerWin[k] == 4){
+                                        computerScore[i][j] += 20000;
+                                    }                        
+                                }
+                            }
+                            
+                            if(myScore[i][j] > max){
+                                max  = myScore[i][j];
+                                u = i;
+                                v = j;
+                            }else if(myScore[i][j] == max){
+                                if(computerScore[i][j] > computerScore[u][v]){
+                                    u = i;
+                                    v = j;    
+                                }
+                            }
+                            
+                            if(computerScore[i][j] > max){
+                                max  = computerScore[i][j];
+                                u = i;
+                                v = j;
+                            }else if(computerScore[i][j] == max){
+                                if(myScore[i][j] > myScore[u][v]){
+                                    u = i;
+                                    v = j;    
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+                _compi = u;
+                _compj = v;
+                oneStep(u,v,false);
+                chressBord[u][v] = 2;  //计算机占据位置
+                for(var k = 0; k < count; k++){
+                    if(wins[u][v][k]){
+                        computerWin[k]++;
+                        _myWin[k] = myWin[k];
+                        myWin[k] = 6;//这个位置对方不可能赢了
+                        if(computerWin[k] == 5){
+                            resultTxt.innerHTML = 'o(╯□╰)o，计算机赢了，路兆梅继续加油哦！';
+                            over = true;
+                        }
+                    }
+                }
+                if(!over){
+                    me = !me;
+                }
+                backAble = true;
+                returnAble = false;
+                var hasClass = new RegExp('unable').test(' ' + returnbtn.className + ' ');
+                if(!hasClass) {
+                    returnbtn.className += ' ' + 'unable';
+                }
+            }
+            //绘画棋盘
+            var drawChessBoard = function() {
+                for(var i = 0; i < 15; i++){
+                    context.moveTo(15 + i * 30 , 15);
+                    context.lineTo(15 + i * 30 , 435);
+                    context.stroke();
+                    context.moveTo(15 , 15 + i * 30);
+                    context.lineTo(435 , 15 + i * 30);
+                    context.stroke();
+                }
+            }
+            //画棋子
+            var oneStep = function(i,j,me) {
+                context.beginPath();
+                context.arc(15 + i * 30, 15 + j * 30, 13, 0, 2 * Math.PI);// 画圆
+                context.closePath();
+                //渐变
+                var gradient = context.createRadialGradient(15 + i * 30 + 2, 15 + j * 30 - 2, 13, 15 + i * 30 + 2, 15 + j * 30 - 2, 0);
+                if(me){
+                    gradient.addColorStop(0,'#0a0a0a');
+                    gradient.addColorStop(1,'#636766');
+                }else{
+                    gradient.addColorStop(0,'#d1d1d1');
+                    gradient.addColorStop(1,'#f9f9f9');
+                }
+                context.fillStyle = gradient;
+                context.fill();
+            }
+            //销毁棋子
+            var minusStep = function(i,j) {
+                //擦除该圆
+                context.clearRect((i) * 30, (j) * 30, 30, 30);
+                // 重画该圆周围的格子
+                context.beginPath();
+                context.moveTo(15+i*30 , j*30);
+                context.lineTo(15+i*30 , j*30 + 30);
+                context.moveTo(i*30, j*30+15);
+                context.lineTo((i+1)*30 , j*30+15);
+    
+                context.stroke();
+            }
+        </script>
+    </body>
 </html>
